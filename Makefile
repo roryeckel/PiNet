@@ -1,13 +1,12 @@
-LINK_TARGET = MPI_hello
+EXECUTABLE = MPI_hello
 OBJECTS = MPI_hello.o
 
+CC = mpicc
+
 %.o: %.c
-	mpicc $(CFLAGS) -o $@ -c $?
+	$(CC) $(CFLAGS) -o $@ -c $?
 
-$(LINK_TARGET): $(OBJECTS)
-	mpicc $(CFLAGS) -o $@ $<
-
-all: $(LINK_TARGET)
+$(EXECUTABLE): $(OBJECTS)
 
 clean:
-	rm -f $(LINK_TARGET) $(OBJECTS)
+	rm -f $(EXECUTABLE) $(OBJECTS)
