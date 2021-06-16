@@ -1,11 +1,12 @@
 EXECUTABLE = pinet
+OBJECTS = pinet.o DartBoard.o
 
 CC = mpicc
 
-#%.o: %.c
-#	$(CC) $(CFLAGS) -o $@ -c $?
+$(EXECUTABLE): $(OBJECTS)
 
-pinet: pinet.c
+%.o: %.c
+	$(CC) -c $< -o $@
 
 clean:
 	rm -f $(EXECUTABLE) $(OBJECTS)
