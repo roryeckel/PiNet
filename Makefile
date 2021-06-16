@@ -1,12 +1,11 @@
-EXECUTABLE = MPI_hello
-OBJECTS = MPI_hello.o
+EXECUTABLE = pinet
 
 CC = mpicc
 
-%.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $?
+#%.o: %.c
+#	$(CC) $(CFLAGS) -o $@ -c $?
 
-$(EXECUTABLE): $(OBJECTS)
+pinet: pinet.c
 
 clean:
 	rm -f $(EXECUTABLE) $(OBJECTS)
