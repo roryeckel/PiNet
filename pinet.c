@@ -1,5 +1,6 @@
 #include <mpi.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "DartBoard.h"
 
@@ -24,8 +25,14 @@ void MPIInfo_Load() {
 
 }
 
+/*void MPIInfo_Log(char message[]) {
+
+    printf("");
+
+}*/
+
 int main(int argc, char* argv[]) {
-    // Initialize the MPI environment
+
     MPI_Init(&argc, &argv);
 
     MPIInfo_Load();
@@ -40,20 +47,23 @@ int main(int argc, char* argv[]) {
 
     if (MPIInfo.IsMaster) {
 
-        DartBoardTask_Create(&task);
+        DartBoardTask_Create(&task, 100, 100);
+
+        printf("(Master) Assigning DartBoardTask #%" PRIu64 " (Seed = %" PRIu64 ", Trials = %" PRIu64 ")\n", task.Id, task.Seed, task.Trials);
 
         MPI_Send(&task, 1, MPI_DartBoardTask, 1, 0, MPI_COMM_WORLD);
-
-        printf("(Master) Sent DartBoardTask: %d, %d, %d, %d\n",
-            task.InsideCircle, task.IsComplete, task.Seed, task.Trials);
 
     } else {
 
         //MPI_Recv(&received, 1, person_type, SENDER, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&task, 1, MPI_DartBoardTask, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-        printf("(Worker) Received DartBoardTask: %d, %d, %d, %d\n",
-            task.InsideCircle, task.IsComplete, task.Seed, task.Trials);
+        printf("(Worker) Received DartBoardTask #%" PRIu64 ", executing...\n", task.Id);
+
+        DartBoardTask_Execute(&task);
+
+        printf("(Worker) DartBoardTask#%" PRIu64 " complete. Results: %" PRIu64 " trials, %" PRIu64 " inside circle.\n",
+            task.Id, task.Trials, task.InsideCircle);
 
     }
 
