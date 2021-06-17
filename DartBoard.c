@@ -9,11 +9,11 @@ void DartBoardTask_Init() {
 
     DartBoardTask dummy;
     MPI_Get_address(&dummy, &baseAddress);
-    MPI_Get_address(&dummy.Id, &baseAddress);
-    MPI_Get_address(&dummy.Trials, &displacements[0]);
-    MPI_Get_address(&dummy.Seed, &displacements[1]);
-    MPI_Get_address(&dummy.IsComplete, &displacements[2]);
-    MPI_Get_address(&dummy.InsideCircle, &displacements[3]);
+    MPI_Get_address(&dummy.Id, &displacements[0]);
+    MPI_Get_address(&dummy.Trials, &displacements[1]);
+    MPI_Get_address(&dummy.Seed, &displacements[2]);
+    MPI_Get_address(&dummy.IsComplete, &displacements[3]);
+    MPI_Get_address(&dummy.InsideCircle, &displacements[4]);
 
     displacements[0] = MPI_Aint_diff(displacements[0], baseAddress);
     displacements[1] = MPI_Aint_diff(displacements[1], baseAddress);
@@ -30,7 +30,7 @@ void DartBoardTask_Init() {
 
 void DartBoardTask_Create(DartBoardTask* task, uint64_t seed, uint64_t trials) {
 
-    static int id = 0;
+    static uint64_t id = 0;
 
     task->Id = id;
     task->InsideCircle = 0;
@@ -66,5 +66,11 @@ void DartBoardTask_Execute(DartBoardTask* task) {
     }
 
     task->IsComplete = 1;
+
+}
+
+void DartBoardTask_Free() {
+
+    MPI_Type_free(&MPI_DartBoardTask);
 
 }

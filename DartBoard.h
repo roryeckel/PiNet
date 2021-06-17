@@ -21,3 +21,4 @@ extern void DartBoardTask_Init();
 extern void DartBoardTask_Create(DartBoardTask* task, uint64_t seed, uint64_t trials);
 extern int DartBoardTask_IsInCircle(float x, float y);
 extern void DartBoardTask_Execute(DartBoardTask* task);
+extern void DartBoardTask_Free();

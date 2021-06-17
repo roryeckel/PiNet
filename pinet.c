@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "DartBoard.h"
+#include "Integration.h"
 
 struct {
 
@@ -41,35 +41,31 @@ int main(int argc, char* argv[]) {
 
     MPIInfo_Load();
 
-    DartBoardTask_Init();
+    IntegrationTask_Init();
 
-    // Print off a hello world message
-    printf("Hello world from processor %s, rank %d out of %d processors\n",
-           MPIInfo.ProcessorName, MPIInfo.WorldRank, MPIInfo.WorldSize);
-
-    DartBoardTask task;
+    IntegrationTask task;
 
     if (MPIInfo.IsMaster) {
 
-        DartBoardTask_Create(&task, 100, 100);
-
-        printf("(Master) Assigning DartBoardTask #%" PRIu64 " (Seed = %" PRIu64 ", Trials = %" PRIu64 ")\n", task.Id, task.Seed, task.Trials);
-
-        MPI_Send(&task, 1, MPI_DartBoardTask, 1, 0, MPI_COMM_WORLD);
-
-    } else {
-
-        //MPI_Recv(&received, 1, person_type, SENDER, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&task, 1, MPI_DartBoardTask, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-        printf("(Worker) Received DartBoardTask #%" PRIu64 ", executing...\n", task.Id);
-
-        DartBoardTask_Execute(&task);
-
-        printf("(Worker) DartBoardTask #%" PRIu64 " complete. Results: %" PRIu64 " trials, %" PRIu64 " inside circle.\n",
-            task.Id, task.Trials, task.InsideCircle);
+        IntegrationTask_Create(&task, 1000);
 
     }
+
+    MPI_Bcast(&task, 1, MPI_IntegrationTask, 0, MPI_COMM_WORLD);
+
+    IntegrationTask_Execute(&task, MPIInfo.WorldRank, MPIInfo.WorldSize);
+
+    double pi = 0.0;
+
+    MPI_Reduce(&task.IntervalSum, &pi, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (MPIInfo.IsMaster) {
+
+        printf("(Master) Estimated pi: %.16f\n", pi);
+
+    }
+
+    IntegrationTask_Free();
 
     MPI_Finalize();
     return 0;
