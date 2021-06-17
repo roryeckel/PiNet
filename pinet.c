@@ -13,6 +13,8 @@ struct {
     int WorldRank;
     int IsMaster;
 
+    FILE* LogFile;
+
 } MPIInfo;
 
 void MPIInfo_Load() {
@@ -23,11 +25,13 @@ void MPIInfo_Load() {
     MPI_Comm_rank(MPI_COMM_WORLD, &MPIInfo.WorldRank);
     MPIInfo.IsMaster = MPIInfo.WorldRank == 0;
 
+    //MPIInfo.LogFile = fopen("", "w");
+
 }
 
 /*void MPIInfo_Log(char message[]) {
 
-    printf("");
+    fprintf("");
 
 }*/
 
@@ -62,7 +66,7 @@ int main(int argc, char* argv[]) {
 
         DartBoardTask_Execute(&task);
 
-        printf("(Worker) DartBoardTask#%" PRIu64 " complete. Results: %" PRIu64 " trials, %" PRIu64 " inside circle.\n",
+        printf("(Worker) DartBoardTask #%" PRIu64 " complete. Results: %" PRIu64 " trials, %" PRIu64 " inside circle.\n",
             task.Id, task.Trials, task.InsideCircle);
 
     }
