@@ -34,6 +34,7 @@ void IntegrationTask_Create(IntegrationTask* task, uint64_t intervalCount) {
     task->IntervalCount = intervalCount;
     task->IsComplete = 0;
     task->IntervalSum = 0.0;
+    //mpf_init(task->IntervalSum);
 
     id--;
 
@@ -42,6 +43,7 @@ void IntegrationTask_Create(IntegrationTask* task, uint64_t intervalCount) {
 void IntegrationTask_Execute(IntegrationTask* task, int worldRank, int worldSize) {
 
     double h = 1.0 / (double) task->IntervalCount;
+
     for (int i = worldRank + 1; i <= task->IntervalCount; i += worldSize) {
 
         double x = h * ((double) i - 0.5);
@@ -52,7 +54,13 @@ void IntegrationTask_Execute(IntegrationTask* task, int worldRank, int worldSize
 
 }
 
-void IntegrationTask_Free() {
+void IntegrationTask_Free(IntegrationTask* task) {
+
+    //mpf_clear(task->IntervalSum);
+
+}
+
+void IntegrationTask_Finalize() {
 
     MPI_Type_free(&MPI_IntegrationTask);
 

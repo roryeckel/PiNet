@@ -47,7 +47,22 @@ int main(int argc, char* argv[]) {
 
     if (MPIInfo.IsMaster) {
 
-        IntegrationTask_Create(&task, 1000);
+        uint64_t intervalCount = 0;
+
+        if (argc > 1) {
+
+            char* ptr;
+            intervalCount = strtol(argv[1], &ptr, 10);
+
+        } else {
+
+            MPI_Abort(MPI_COMM_WORLD, 1);
+
+            return 1;
+
+        }
+
+        IntegrationTask_Create(&task, intervalCount);
 
     }
 
@@ -55,18 +70,25 @@ int main(int argc, char* argv[]) {
 
     IntegrationTask_Execute(&task, MPIInfo.WorldRank, MPIInfo.WorldSize);
 
-    double pi = 0.0;
+    double expectedPi = 3.1415926535897932384626433832795028841971693993751058209749;
+    double estimatedPi = 0.0;
 
-    MPI_Reduce(&task.IntervalSum, &pi, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&task.IntervalSum, &estimatedPi, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    double error = estimatedPi - expectedPi;
 
     if (MPIInfo.IsMaster) {
 
-        printf("(Master) Estimated pi: %.16f\n", pi);
+        printf("(Master) Pi: Estimated = %.16f\n", estimatedPi);
+        printf("(Master) Pi: Estimated - Expected = %.16f\n", error);
 
     }
 
-    IntegrationTask_Free();
+    IntegrationTask_Free(&task);
+
+    IntegrationTask_Finalize();
 
     MPI_Finalize();
+    
     return 0;
 }

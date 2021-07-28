@@ -1,5 +1,5 @@
 EXECUTABLE = pinet
-SOURCE.c = pinet.c DartBoard.c Integration.c
+SOURCE.c = pinet.c MonteCarlo.c Integration.c
 SOURCE.o = ${SOURCE.c:.c=.o}
 PREFIX = /usr/local
 
